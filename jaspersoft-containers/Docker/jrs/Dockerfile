@@ -12,7 +12,7 @@ FROM ${TOMCAT_BASE_IMAGE} as deployment
 ARG JASPERREPORTS_SERVER_VERSION
 ARG INSTALL_CHROMIUM
 ARG CONTAINER_DISTRO=jaspersoft-containers/Docker/jrs
-ARG JRS_DISTRO=jasperreports-server-pro-${JASPERREPORTS_SERVER_VERSION}-bin
+ARG JRS_DISTRO=jasperreports-server-cp-${JASPERREPORTS_SERVER_VERSION}-bin
 
 
 ENV INSTALL_CHROMIUM ${INSTALl_CHROMIUM:-false}
@@ -22,7 +22,7 @@ ENV BUILDOMATIC_MODE non-interactive
 
 COPY ${JRS_DISTRO}/buildomatic ${JRS_HOME}/buildomatic/
 COPY ${JRS_DISTRO}/apache-ant ${JRS_HOME}/apache-ant/
-COPY ${JRS_DISTRO}/jasperserver-pro.war  ${JRS_HOME}/
+COPY ${JRS_DISTRO}/jasperserver.war  ${JRS_HOME}/
 COPY ${CONTAINER_DISTRO}/resources/buildomatic-customization ${JRS_HOME}/buildomatic/
 COPY ${CONTAINER_DISTRO}/resources/default-properties ${JRS_HOME}/buildomatic/
 COPY ${CONTAINER_DISTRO}/resources/keystore /usr/local/share/jasperserver-pro/keystore
@@ -43,7 +43,7 @@ RUN useradd -m jasperserver -u 10099 && chown -R jasperserver:root $CATALINA_HOM
                             chown -R jasperserver:root /usr/local/share/jasperserver-pro/keystore
 #USER jasperserver
 WORKDIR ${JRS_HOME}/buildomatic/
-RUN ./js-ant test-pro-all-props check-dbtype-pro test-appServerType-pro deploy-webapp-pro-if-needed
+RUN ./js-ant test-ce-all-props check-dbtype-ce test-appServerType-ce deploy-webapp-ce-if-needed
 #set-minimal-mode gen-config pre-install-test-pro prepare-js-pro-db-minimal
 RUN chgrp -R 0 $CATALINA_HOME && \
     chmod -R g=u $CATALINA_HOME
@@ -79,7 +79,7 @@ USER 10099
 WORKDIR $CATALINA_HOME
 COPY --from=deployment --chown=jasperserver:root /usr/local/tomcat .
 COPY --chown=jasperserver:root ${CONTAINER_DISTRO}/resources/jasperserver-customization .
-COPY --chown=jasperserver:root ${CONTAINER_DISTRO}/cluster-config/WEB-INF  $CATALINA_HOME/webapps/jasperserver-pro/WEB-INF/
+COPY --chown=jasperserver:root ${CONTAINER_DISTRO}/cluster-config/WEB-INF  $CATALINA_HOME/webapps/jasperserver/WEB-INF/
 
 
 EXPOSE 8080 8443
